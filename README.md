@@ -13,12 +13,14 @@ kakopay
    - 결론 : 현존하는 무결성, 무중복 알고리즘으로 판단하였고, 해당 알고리즘의 Hash 값을 seed로 가지는 hash를 만들면, 무중복성을 가장 효율적으로 해결 할 수 있다고 판단하였음.
   
 # Project build
-  - 해당 프로젝트를 eclipse에 Gradle Project로 프로젝트를 만들어, Spring Boot APP 로 Run.
+  - 해당 소스를 다운 받아, gradle을 이용하여 빌드한다.
+  - $gradle build
   
 # 실행 방법
- 1. 클라이언트를 로컬 파일로 테스트를 진행하였기 때문에, 크롬의 외부요청 가능 옵션 혹은 외부요청 가능 플러그인을 설치한다.
- 2. https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi?utm_source=chrome-ntp-icon 
- 3. 브라우져에 index.html 경로 입력하여, 웹 어플리케이션을 호출한다.
- 4. e-mail 입력부에 공백으로 조회 버튼을 호출하면, 전체조회(페이징 : 5 row, 2 page)가 가능하다.
- 5. e-mail 입력 후에 조회 버튼을 호출하면, 단건 조회를 한다.
- 6. e-mail 입력 후에 발급 버튼을 누르면, 쿠폰번호를 발급 받는다.
+ 1. 빌드된 프로젝트에서 $gradle bootrun 을 수행하여, 서버를 동작시킨다.
+ 2. 클라이언트를 로컬 파일로 테스트를 진행하였기 때문에, 크롬의 외부요청 가능 옵션 혹은 외부요청 가능 플러그인을 설치한다.
+ 3. https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi?utm_source=chrome-ntp-icon 
+ 4. 브라우져에 index.html 경로 입력하여, 웹 어플리케이션을 호출한다.
+ 5. e-mail 입력부에 공백으로 조회 버튼을 호출하면, 전체조회(페이징 : 5 row, 2 page)가 가능하다.
+ 6. e-mail 입력 후에 조회 버튼을 호출하면, 단건 조회를 한다.
+ 7. e-mail 입력 후에 발급 버튼을 누르면, 쿠폰번호를 발급 받는다.
