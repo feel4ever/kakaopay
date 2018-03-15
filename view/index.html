@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<meta charset="utf-8">
 	<title>kakaopay</title>
@@ -9,93 +10,97 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/twbs-pagination/1.4.1/jquery.twbsPagination.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 </head>
+
 <body>
-	<form class= "form-horizontal" style="padding : 20px;">
+	<form class="form-horizontal" style="padding : 20px;">
 		<div class="form-group row">
-		  <div class="col-sm-3">
-			<input type="email" class="form-control" id="inputEmail" placeholder="Email">
-			<input type="hidden" id="startPage" name="startPage" value="">
-      <input type="hidden" id="visiblePages" name="visiblePages" value="">
-		  </div>
+			<div class="col-sm-3">
+				<input type="email" class="form-control" id="inputEmail" placeholder="Email">
+				<input type="hidden" id="startPage" name="startPage" value="">
+				<input type="hidden" id="visiblePages" name="visiblePages" value="">
+			</div>
 		</div>
 		<div class="form-group row">
-		  <div class="col-sm-10">
-			<button type="button" class="btn btn-primary" id="inquiry">조 회</button>
-			<button type="button" class="btn btn-primary" id="getCoupon">발 급</button>	
-		  </div>
+			<div class="col-sm-10">
+				<button type="button" class="btn btn-primary" id="inquiry">조 회</button>
+				<button type="button" class="btn btn-primary" id="getCoupon">발 급</button>
+			</div>
 		</div>
-	  </form>
-	  <table data-toggle="table" class="table table-hover" id="dataTable">
+	</form>
+	<table data-toggle="table" class="table table-hover" id="dataTable">
 		<thead>
-		  <tr>
+			<tr>
 				<th data-field="id">#</th>
 				<th data-field="email">E-Mail</th>
 				<th data-field="couponNo">Coupon</th>
 				<th data-field="createdAt">Issue Time</th>
-		  </tr>
+			</tr>
 		</thead>
 		<tbody id="tbody"></tbody>
-	  </table>
-	  <div class="text-center">
+	</table>
+	<div class="text-center">
 		<nav aria-label="Page navigation">
 			<ul class="pagination justify-content-center" id="pagination">
-			<!-- <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-			<li class="page-item"><a class="page-link" href="#">1</a></li>
-			<li class="page-item"><a class="page-link" href="#">2</a></li>
-			<li class="page-item"><a class="page-link" href="#">3</a></li>
-			<li class="page-item"><a class="page-link" href="#">Next</a></li> -->
 			</ul>
 		</nav>
-	  </div>
+	</div>
 	<script>
-		$(document).ready(function() {
-		
-			$('#inquiry').click(function(){ 
+		$(document).ready(function () {
+
+			$('#inquiry').click(function () {
 				var email = $("#inputEmail").val().trim();
 				var isEmpty = email.length <= 0;
-				if(!isEmpty){
+				if (!isEmpty) {
 					$.ajax({
-							url : "http://localhost:8080/coupon/" + email,
-							type : "get",
-							data : "",
-							success : function(data){
-								gridRow(data.result);
-							},
-							error(e){
-								console.log(e);
-							}
-						});
-				}else{ 
+						url: "http://localhost:8080/coupon/" + email,
+						type: "get",
+						data: "",
+						success: function (data) {
+							gridRow(data.result);
+						},
+						error(e) {
+							console.log(e);
+						}
+					});
+				} else {
 					$.ajax({
-						url : "http://localhost:8080/coupons/total",
-						type : "get",
-						data : "",
-						success : function(data){
+						url: "http://localhost:8080/coupons/total",
+						type: "get",
+						data: "",
+						success: function (data) {
 							paging(data.result);
 						},
-						error(e){
+						error(e) {
 							console.log(e);
 						}
 					});
 				}
-			});  			
+			});
 
-			$('#getCoupon').click(function(){
+			$('#getCoupon').click(function () {
 
 				var email = $("#inputEmail").val().trim();
-				if(email.length <= 0) {
+				if (email.length <= 0) {
 					alert('이메일을 입력해주세요.');
 					return;
 				}
 
 				$.ajax({
-					url : "http://localhost:8080/coupon",
+					url: "http://localhost:8080/coupon",
 					type: "post",
-					data : {
-						email : email
+					data: {
+						email: email
 					},
-					success : function(data) {
-						var msg = '쿠폰이 정상적으로 발급되었습니다.\nemail : '+ data.result.email + '\n' + '쿠폰번호 : '+ data.result.couponNo;
+					success: function (data) {
+						if(data.responseCode=="300"){
+							alert("쿠폰이 이미 발급된 E-mail입니다.");
+							return;
+						}
+						if(data.responseCode=="400"){
+							alert("올바른 E-mail주소가 아닙니다.");
+							return;
+						}
+						var msg = '쿠폰이 정상적으로 발급되었습니다.\nemail : ' + data.result.email + '\n' + '쿠폰번호 : ' + couponFormat(data.result.couponNo);
 						alert(msg);
 					},
 					error(e) {
@@ -111,17 +116,17 @@
 				$('#tbody').empty();
 
 				console.log(rows.length);
-				if(rows.length == 0) {
-					$('#tbody').append($('<tr>').append($('<td>').attr('colspan','4').text('없음')));
+				if (rows.length == 0) {
+					$('#tbody').append($('<tr>').append($('<td>').attr('colspan', '4').text('없음')));
 					return;
 				}
 
-				$.each(rows, function(idx, item){
+				$.each(rows, function (idx, item) {
 					$('#tbody').append(
 						$('<tr>')
 							.append($('<td>').text(item.id))
 							.append($('<td>').text(item.email))
-							.append($('<td>').text(item.couponNo))
+							.append($('<td>').text(couponFormat(item.couponNo)))
 							.append($('<td>').text(item.createdAt)));
 				});
 
@@ -131,57 +136,72 @@
 				$('#tbody').empty();
 				$('#pagination').empty();
 
-				if(!row) {
-					$('#tbody').append($('<tr>').append($('<td>').attr('colspan','4').text('없음')));
+				if (!row) {
+					$('#tbody').append($('<tr>').append($('<td>').attr('colspan', '4').text('없음')));
 					return;
 				}
 
 				$('#tbody').append(
-						$('<tr>')
-							.append($('<td>').text(row.id))
-							.append($('<td>').text(row.email))
-							.append($('<td>').text(row.couponNo))
-							.append($('<td>').text(row.createdAt)));
+					$('<tr>')
+						.append($('<td>').text(row.id))
+						.append($('<td>').text(row.email))
+						.append($('<td>').text(couponFormat(row.couponNo)))
+						.append($('<td>').text(row.createdAt)));
 			}
 
-			function inquriy(page){
+			function inquriy(page) {
 				$.ajax({
-					url : "http://localhost:8080/coupons",
-					type : "get",
-					data : {page : page, take:5},
-					success : function(data) {
+					url: "http://localhost:8080/coupons",
+					type: "get",
+					data: { page: page, take: 5 },
+					success: function (data) {
 						console.log(data.result);
-						gridRows(data.result);		
+						gridRows(data.result);
 					},
-					error: function(e) {
+					error: function (e) {
 						console.log(e);
 					}
-					
-				});	
+
+				});
 			}
 
-			function paging(totCnt){
-				var modul = totCnt%5;
-				var totalPages = 0;//${totalPage};//전체 페이지
-				if(modul == 0){
+			function paging(totCnt) {
+				var modul = totCnt % 5;
+				var totalPages = 0;
+				if (modul == 0) {
 					totalPages = totCnt / 5;
-				}else{
+				} else {
 					totalPages = totCnt / 5 + 1;
 				}
-				 var visiblePages = 2;
-         var startPage = 1;
-                 
-         $('#pagination').twbsPagination({
-            totalPages: totalPages,
-            visiblePages: visiblePages,
-            startPage: startPage,
-            onPageClick: function (event, page) {
-						inquriy(page-1);
-             }
-          });
-			 }
+				var visiblePages = 2;
+				var startPage = 1;
 
+				$('#pagination').twbsPagination({
+					totalPages: totalPages,
+					visiblePages: visiblePages,
+					startPage: startPage,
+					onPageClick: function (event, page) {
+						inquriy(page - 1);
+					}
+				});
+			}
+
+			function couponFormat(coupon){				
+				var tmp1 = "";
+				var tmp2 = "";
+				var tmp3 = "";
+				var tmp4 = "";
+
+				tmp1 = coupon.substr(0, 4);
+				tmp2 = coupon.substr(4, 4);
+				tmp3 = coupon.substr(8, 4);
+				tmp4 = coupon.substr(12, 4);
+
+				return tmp1 + "-" + tmp2 + "-" + tmp3 + "-" + tmp4;
+				
+			}
 		});
 	</script>
 </body>
+
 </html>
